@@ -11,34 +11,41 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "email", type: "text" },
-        password: { label: "password", type: "password" },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email and password are required");
+          }
+
+          const user = await prisma.tUser.findUnique({
+            where: {
+              email: credentials.email,
+            },
+          });
+
+          if (!user || !user?.hashedPassword) {
+            throw new Error("User not found");
+          }
+
+          const isCorrectPassword = await bcrypt.compare(
+            credentials.password,
+            user.hashedPassword
+          );
+
+          if (!isCorrectPassword) {
+            throw new Error("Incorrect password");
+          }
+
+          return Promise.resolve(user);
+        } catch (error) {
+          // Log the detailed error for debugging purposes
+          console.error("Authentication error:");
+          // Throw a generic error message to the client
+          throw new Error("Authentication failed");
         }
-
-        const user = await prisma.tUser.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
-
-        if (!user || !user?.hashedPassword) {
-          throw new Error("Invalid credentials");
-        }
-
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
-
-        if (!isCorrectPassword) {
-          throw new Error("Invalid credentials");
-        }
-
-        return user;
       },
     }),
   ],
@@ -47,9 +54,9 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   jwt: {
-    secret: process.env.NEXTAUTH_JWT_SECRET,
+    secret: process.env.NEXTAUTH_JWT_SECRET || "NEXT_AUTH_JWT_SECRET",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "NEXT_AUTH_SECRET",
 };
 
 export default NextAuth(authOptions);
