@@ -17,24 +17,31 @@ const SignInModal = () => {
     try {
       setIsLoading(true);
 
+      if (!email || !password) {
+        toast.error("Please enter both email and password.");
+        return;
+      }
+
       const signInResult = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
-      if (signInResult?.error && signInResult?.error === "No such user found") {
-        toast.error("User not found. Please register.");
-        loginModal.onClose();
-        registerModal.onOpen();
-      } else if (signInResult?.error) {
-        toast.error(signInResult?.error);
+      if (signInResult?.error) {
+        if (signInResult.error === "No such user found") {
+          toast.error("User not found. Please register.");
+          loginModal.onClose();
+          registerModal.onOpen();
+        } else {
+          toast.error(signInResult.error);
+        }
       } else {
         toast.success("Logged in");
         loginModal.onClose();
       }
     } catch (error) {
-      // Catch unexpected errors
+      console.error("Authentication error:", error);
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
