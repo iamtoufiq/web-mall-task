@@ -54,9 +54,9 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   jwt: {
-    secret: process.env.NEXTAUTH_JWT_SECRET || "NEXT_AUTH_JWT_SECRET",
+    secret: "NEXT_AUTH_JWT_SECRET",
   },
-  secret: process.env.NEXTAUTH_SECRET || "NEXT_AUTH_SECRET",
+  secret: "NEXT_AUTH_SECRET",
 };
 
 export default NextAuth(authOptions);
