@@ -52,23 +52,21 @@ const SignInModal = () => {
     loginModal.onClose();
     registerModal.onOpen();
   }, [loginModal, registerModal]);
+
   const footerContent = (
     <div className="text-neutral-400 text-center mt-4">
       <p>
         First time using Twitter?
         <span
           onClick={onToggle}
-          className="
-            text-white 
-            cursor-pointer 
-            hover:underline
-          "
+          className="    text-white  cursor-pointer hover:underline  "
         >
           Create an account
         </span>
       </p>
     </div>
   );
+
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Input
@@ -84,14 +82,16 @@ const SignInModal = () => {
         value={password}
         disabled={isLoading}
       />
+      {/* Add a "Forgot Password?" link/button here if needed */}
     </div>
   );
+
   return (
     <Modal
       disabled={isLoading}
       isOpen={loginModal.isOpen}
       title="Login"
-      actionLabel="Sign in"
+      actionLabel={isLoading ? "Signing in..." : "Sign in"}
       onClose={loginModal.onClose}
       onSubmit={onSubmit}
       body={bodyContent}

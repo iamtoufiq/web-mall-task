@@ -36,7 +36,8 @@ const AppSidebar = () => {
     <div className="col-span-1 h-full pr-4 md:pr-6">
       <div className="flex flex-col items-end">
         <div className="space-y-2 lg:w-[230px]">
-          <SidebarLogo />
+          <SidebarLogo title="twit talk" />
+
           {items.map((item) => (
             <AppSidebarItem
               key={item.href}
@@ -47,6 +48,7 @@ const AppSidebar = () => {
               label={item.label}
             />
           ))}
+
           {currentUser && (
             <AppSidebarItem
               onClick={() => signOut()}
@@ -54,6 +56,7 @@ const AppSidebar = () => {
               label="Logout"
             />
           )}
+
           <SidebarTweetButton />
         </div>
       </div>
