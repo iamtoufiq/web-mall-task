@@ -72,6 +72,7 @@ const Form: React.FC<FormProps> = ({ placeholder, isComment, postId }) => {
                 text-[20px] 
                 placeholder-neutral-500 
                 text-white
+                overflow-auto scrollbar-hide
               "
               placeholder={placeholder}
             ></textarea>

@@ -37,6 +37,7 @@ const Avatar: React.FC<AvatarProps> = ({ userId, isLarge, hasBorder }) => {
         transition 
         cursor-pointer
         relative
+        min-w-[50px]
       `}
     >
       <Image
