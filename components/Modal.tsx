@@ -66,6 +66,7 @@ const Modal: React.FC<ModalProps> = ({
               secondary
               fullWidth
               large
+              type="button"
               onClick={handleSubmit}
             />
 

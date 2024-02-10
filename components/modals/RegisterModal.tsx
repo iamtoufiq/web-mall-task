@@ -1,6 +1,8 @@
 import { toast } from "react-hot-toast";
 import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 import useLoginModal from "@/hooks/useLoginModal";
 import useRegisterModal from "@/hooks/useRegisterModal";
@@ -13,77 +15,85 @@ const RegisterModal = () => {
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      name: "",
+      username: "",
+    },
+    validationSchema: Yup.object().shape({
+      email: Yup.string().email("Invalid email").required("Email is required"),
+      password: Yup.string().required("Password is required"),
+      name: Yup.string().required("Name is required"),
+      username: Yup.string().required("Username is required"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        await axios.post("/api/register", {
+          email: values.email,
+          password: values.password,
+          username: values.username,
+          name: values.name,
+        });
 
-  const [isLoading, setIsLoading] = useState(false);
+        toast.success("Account created.");
 
+        // Sign in with the provided credentials
+        await signIn("credentials", {
+          email: values.email,
+          password: values.password,
+          redirect: false,
+        });
+
+        registerModal.onClose();
+      } catch (error) {
+        console.error("Registration error:", error);
+        toast.error("Something went wrong");
+      }
+    },
+  });
   const onToggle = useCallback(() => {
-    if (isLoading) {
+    if (formik.isSubmitting) {
       return;
     }
 
     registerModal.onClose();
     loginModal.onOpen();
-  }, [loginModal, registerModal, isLoading]);
-
-  const onSubmit = useCallback(async () => {
-    try {
-      setIsLoading(true);
-
-      await axios.post("/api/register", {
-        email,
-        password,
-        username,
-        name,
-      });
-
-      setIsLoading(false);
-
-      toast.success("Account created.");
-
-      signIn("credentials", {
-        email,
-        password,
-      });
-
-      registerModal.onClose();
-      loginModal.onOpen();
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [email, password, username, name, registerModal, loginModal]);
-
+  }, [loginModal, registerModal, formik.isSubmitting]);
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Input
-        disabled={isLoading}
+        name="email"
         placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={formik.handleChange}
+        value={formik.values.email}
+        disabled={formik.isSubmitting}
+        isError={!!(formik.touched.email && formik.errors.email)}
       />
       <Input
-        disabled={isLoading}
+        name="name"
         placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={formik.handleChange}
+        value={formik.values.name}
+        disabled={formik.isSubmitting}
+        isError={!!(formik.touched.name && formik.errors.name)}
       />
       <Input
-        disabled={isLoading}
+        name="username"
         placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={formik.handleChange}
+        value={formik.values.username}
+        disabled={formik.isSubmitting}
+        isError={!!(formik.touched.username && formik.errors.username)}
       />
       <Input
-        disabled={isLoading}
+        name="password"
         placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={formik.handleChange}
+        value={formik.values.password}
+        disabled={formik.isSubmitting}
+        isError={!!(formik.touched.password && formik.errors.password)}
       />
     </div>
   );
@@ -108,12 +118,12 @@ const RegisterModal = () => {
 
   return (
     <Modal
-      disabled={isLoading}
+      disabled={formik.isSubmitting}
       isOpen={registerModal.isOpen}
       title="Create an account"
       actionLabel="Register"
       onClose={registerModal.onClose}
-      onSubmit={onSubmit}
+      onSubmit={formik.handleSubmit}
       body={bodyContent}
       footer={footerContent}
     />

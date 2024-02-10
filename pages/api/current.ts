@@ -7,15 +7,19 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== "GET") {
-    return res.status(405).end();
+    return res
+      .status(405)
+      .json({ error: "Method not allowed. Only GET requests are supported." });
   }
 
   try {
     const { currentUser } = await serverAuth(req, res);
 
+    // Assuming currentUser is not undefined and is the expected user object
     return res.status(200).json(currentUser);
   } catch (error) {
-    console.log(error);
-    return res.status(400).end();
+    console.error(error);
+    // Provide a more descriptive error message to the client
+    return res.status(400).json({ error: "Failed to authenticate user." });
   }
 }

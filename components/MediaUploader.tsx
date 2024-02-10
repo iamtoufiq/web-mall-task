@@ -57,7 +57,12 @@ const MediaUploader: React.FC<MediaUploaderProps> = ({
       <input {...getInputProps()} />
       {base64 ? (
         <div className="flex items-center justify-center">
-          <Image src={base64} height="100" width="100" alt="Uploaded image" />
+          <Image
+            src={base64}
+            alt="Uploaded image"
+            width={100} // Set the width
+            height={100} // Set the height
+          />
         </div>
       ) : (
         <p className="text-white">{label}</p>

@@ -50,6 +50,7 @@ const Avatar: React.FC<AvatarProps> = ({ userId, isLarge, hasBorder }) => {
         }}
         alt="Avatar"
         onClick={onClick}
+        priority
         src={fetchedUser?.profileImage || "/images/placeholder.png"}
       />
     </div>
